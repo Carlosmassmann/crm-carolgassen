@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Carol Nutri — CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+/* ── RESET & ROOT ────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:        #F4EEE5;
+  --bg-card:   #F0EDE6;
+  --bg-muted:  #D6CDC8;
+  --sidebar:   #602F19;
+  --sidebar-h: #4d2414;
+  --olive:     #655A3C;
+  --olive-l:   #7a6e4e;
+  --gold:      #845310;
+  --gold-l:    #FAE2BA;
+  --taupe:     #98867A;
+  --dark:      #2D1F0E;
+  --white:     #FDFAF6;
+  --danger:    #b94040;
+  --success:   #4a7c59;
+
+  --r:   10px;
+  --r-lg: 16px;
+  --shadow: 0 2px 12px rgba(45,31,14,.08);
+  --shadow-md: 0 4px 24px rgba(45,31,14,.13);
+
+  --sidebar-w: 240px;
+  --topbar-h:  64px;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: var(--bg);
+  color: var(--dark);
+  min-height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ── SCROLLBAR ───────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg-muted); border-radius: 3px; }
+
+/* ── SIDEBAR ─────────────────────────────────── */
+#sidebar {
+  width: var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--sidebar);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  transition: transform .3s ease;
+}
+
+.sidebar-logo {
+  padding: 28px 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sidebar-logo img {
+  width: 120px;
+  filter: brightness(0) invert(1);
+  object-fit: contain;
+}
+
+.sidebar-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.35);
+  padding: 20px 20px 8px;
+}
+
+nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 20px;
+  color: rgba(255,255,255,.75);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background .18s, color .18s;
+  border-left: 3px solid transparent;
+}
+nav a:hover { background: rgba(255,255,255,.08); color: #fff; }
+nav a.active {
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  border-left-color: var(--gold-l);
+}
+nav a svg { flex-shrink: 0; opacity: .8; }
+nav a.active svg { opacity: 1; }
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255,255,255,.1);
+  font-size: 12px;
+  color: rgba(255,255,255,.4);
+}
+
+/* ── MAIN WRAPPER ────────────────────────────── */
+#main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* ── TOPBAR ──────────────────────────────────── */
+#topbar {
+  height: var(--topbar-h);
+  background: var(--white);
+  border-bottom: 1px solid var(--bg-muted);
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.topbar-title { font-family: 'Libre Baskerville', serif; font-size: 19px; color: var(--dark); }
+.topbar-title span { color: var(--gold); }
+.topbar-spacer { flex: 1; }
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--bg-muted);
+  border-radius: 8px;
+  padding: 8px 14px;
+  width: 260px;
+}
+.search-box input {
+  border: none;
+  background: transparent;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  color: var(--dark);
+  outline: none;
+  width: 100%;
+}
+.search-box input::placeholder { color: var(--taupe); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: var(--r);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all .18s;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--sidebar); color: #fff; }
+.btn-primary:hover { background: var(--sidebar-h); }
+.btn-secondary { background: var(--bg-card); color: var(--dark); border: 1px solid var(--bg-muted); }
+.btn-secondary:hover { background: var(--bg-muted); }
+.btn-olive { background: var(--olive); color: #fff; }
+.btn-olive:hover { background: var(--olive-l); }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-sm { padding: 6px 13px; font-size: 12px; }
+.btn-xs { padding: 4px 10px; font-size: 11px; }
+.btn-icon { padding: 8px; border-radius: 8px; }
+
+/* ── PAGE CONTENT ────────────────────────────── */
+#content {
+  flex: 1;
+  padding: 28px;
+  overflow-y: auto;
+  height: calc(100vh - var(--topbar-h));
+}
+
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── CARDS ───────────────────────────────────── */
+.card {
+  background: var(--white);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--bg-muted);
+  box-shadow: var(--shadow);
+  padding: 22px;
+}
+
+/* ── KPI GRID ────────────────────────────────── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.kpi-card {
+  background: var(--white);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--bg-muted);
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: var(--shadow);
+}
+.kpi-label { font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--taupe); }
+.kpi-value { font-family: 'Libre Baskerville', serif; font-size: 32px; color: var(--dark); line-height: 1; }
+.kpi-sub { font-size: 12px; color: var(--taupe); }
+.kpi-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 8px;
+}
+.kpi-icon.burgundy { background: rgba(96,47,25,.12); color: var(--sidebar); }
+.kpi-icon.olive    { background: rgba(101,90,60,.12); color: var(--olive); }
+.kpi-icon.gold     { background: rgba(132,83,16,.12); color: var(--gold); }
+.kpi-icon.taupe    { background: rgba(152,134,122,.15); color: var(--taupe); }
+
+/* ── DASHBOARD GRID ──────────────────────────── */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
+}
+.dashboard-grid-full { grid-column: 1 / -1; }
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.section-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 17px;
+  color: var(--dark);
+}
+.section-title small {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  color: var(--taupe);
+  font-weight: 400;
+  margin-left: 8px;
+}
+
+/* ── LEAD ROW ────────────────────────────────── */
+.lead-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--bg-card);
+  cursor: pointer;
+  transition: background .15s;
+  border-radius: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+.lead-row:last-child { border-bottom: none; }
+.lead-row:hover { background: var(--bg-card); }
+
+.avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--sidebar);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.avatar.olive   { background: var(--olive); }
+.avatar.gold    { background: var(--gold); }
+.avatar.taupe   { background: var(--taupe); }
+.avatar.success { background: var(--success); }
+
+.lead-info { flex: 1; min-width: 0; }
+.lead-name { font-size: 13.5px; font-weight: 600; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lead-meta { font-size: 12px; color: var(--taupe); margin-top: 2px; }
+
+/* ── BADGES ──────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.badge-novo      { background: rgba(152,134,122,.18); color: var(--taupe); }
+.badge-avaliacao { background: rgba(132,83,16,.15);   color: var(--gold); }
+.badge-agendado  { background: rgba(101,90,60,.15);   color: var(--olive); }
+.badge-paciente  { background: rgba(74,124,89,.15);   color: var(--success); }
+.badge-inativo   { background: rgba(185,64,64,.12);   color: var(--danger); }
+.badge-sm { padding: 2px 8px; font-size: 10px; }
+
+/* ── APPOINTMENT ITEM ────────────────────────── */
+.appt-item {
+  display: flex;
+  gap: 14px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--bg-card);
+  align-items: flex-start;
+}
+.appt-item:last-child { border-bottom: none; }
+.appt-date-box {
+  width: 44px; min-width: 44px;
+  text-align: center;
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 6px 4px;
+}
+.appt-day   { font-family: 'Libre Baskerville', serif; font-size: 20px; color: var(--sidebar); line-height: 1; }
+.appt-month { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--taupe); }
+.appt-info  { flex: 1; }
+.appt-name  { font-size: 13px; font-weight: 600; }
+.appt-time  { font-size: 12px; color: var(--taupe); margin-top: 2px; }
+.appt-type  { font-size: 11px; color: var(--gold); font-weight: 600; margin-top: 3px; }
+
+/* ── SOURCE CHART ────────────────────────────── */
+.source-list { display: flex; flex-direction: column; gap: 10px; }
+.source-item { display: flex; align-items: center; gap: 10px; }
+.source-bar-wrap { flex: 1; background: var(--bg-card); border-radius: 4px; height: 8px; overflow: hidden; }
+.source-bar { height: 100%; border-radius: 4px; transition: width .6s ease; }
+.source-label { font-size: 12px; color: var(--dark); min-width: 90px; }
+.source-count { font-size: 12px; color: var(--taupe); min-width: 24px; text-align: right; }
+
+/* ── KANBAN ──────────────────────────────────── */
+#page-pipeline .pipeline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+.pipeline-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.kanban-col {
+  background: var(--bg-card);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--bg-muted);
+  overflow: hidden;
+}
+.kanban-col-header {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--bg-muted);
+}
+.kanban-col-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+.kanban-count {
+  background: rgba(255,255,255,.8);
+  border-radius: 12px;
+  padding: 2px 9px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.kanban-cards {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 80px;
+}
+.kanban-card {
+  background: var(--white);
+  border-radius: 10px;
+  border: 1px solid var(--bg-muted);
+  padding: 14px;
+  cursor: pointer;
+  transition: box-shadow .18s, transform .18s;
+  box-shadow: var(--shadow);
+}
+.kanban-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.kanban-card-name  { font-size: 13.5px; font-weight: 600; margin-bottom: 5px; }
+.kanban-card-goal  { font-size: 11.5px; color: var(--taupe); margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
+.kanban-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.kanban-card-source { font-size: 11px; color: var(--gold); font-weight: 600; }
+.kanban-card-date   { font-size: 11px; color: var(--taupe); }
+.kanban-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 8px 12px 12px;
+  padding: 8px;
+  border: 1.5px dashed var(--bg-muted);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--taupe);
+  cursor: pointer;
+  transition: all .18s;
+}
+.kanban-add:hover { border-color: var(--sidebar); color: var(--sidebar); background: rgba(96,47,25,.04); }
+
+.col-novo      .kanban-col-header { background: rgba(152,134,122,.1); }
+.col-novo      .kanban-col-title  { color: var(--taupe); }
+.col-avaliacao .kanban-col-header { background: rgba(132,83,16,.08); }
+.col-avaliacao .kanban-col-title  { color: var(--gold); }
+.col-agendado  .kanban-col-header { background: rgba(101,90,60,.1); }
+.col-agendado  .kanban-col-title  { color: var(--olive); }
+.col-paciente  .kanban-col-header { background: rgba(74,124,89,.1); }
+.col-paciente  .kanban-col-title  { color: var(--success); }
+
+/* ── PATIENTS TABLE ──────────────────────────── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  text-align: left;
+  padding: 11px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--taupe);
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--bg-muted);
+}
+tbody tr {
+  border-bottom: 1px solid var(--bg-card);
+  transition: background .15s;
+  cursor: pointer;
+}
+tbody tr:hover { background: var(--bg-card); }
+tbody td {
+  padding: 13px 14px;
+  font-size: 13px;
+  vertical-align: middle;
+}
+tbody td:first-child { font-weight: 600; }
+.td-flex { display: flex; align-items: center; gap: 10px; }
+
+/* ── AGENDA / CALENDAR ───────────────────────── */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  align-items: start;
+}
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.cal-nav {
+  display: flex; gap: 6px;
+}
+.cal-nav button {
+  border: 1px solid var(--bg-muted);
+  background: var(--white);
+  border-radius: 7px;
+  width: 32px; height: 32px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--dark);
+  transition: background .15s;
+}
+.cal-nav button:hover { background: var(--bg-card); }
+.cal-month-name { font-family: 'Libre Baskerville', serif; font-size: 18px; }
+
+.cal-days-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  margin-bottom: 6px;
+}
+.cal-days-header span {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--taupe);
+  padding: 6px 0;
+}
+.cal-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.cal-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 6px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background .15s;
+  position: relative;
+}
+.cal-day:hover { background: var(--bg-card); }
+.cal-day.other-month { color: var(--bg-muted); }
+.cal-day.today { background: var(--sidebar); color: #fff; font-weight: 700; }
+.cal-day.today:hover { background: var(--sidebar-h); }
+.cal-day.has-event::after {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--gold);
+  position: absolute;
+  bottom: 6px;
+}
+.cal-day.today.has-event::after { background: var(--gold-l); }
+.cal-day.selected { background: rgba(96,47,25,.12); color: var(--sidebar); font-weight: 700; }
+
+.agenda-events { display: flex; flex-direction: column; gap: 8px; }
+.agenda-event {
+  background: var(--white);
+  border: 1px solid var(--bg-muted);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  cursor: pointer;
+  transition: box-shadow .15s;
+}
+.agenda-event:hover { box-shadow: var(--shadow-md); }
+.agenda-event-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.agenda-event-body { flex: 1; }
+.agenda-event-name { font-size: 13px; font-weight: 600; }
+.agenda-event-time { font-size: 12px; color: var(--taupe); margin-top: 2px; }
+.agenda-event-actions { display: flex; gap: 6px; }
+
+/* ── MODAL ───────────────────────────────────── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(45,31,14,.45);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--white);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-md);
+  width: 100%;
+  max-width: 580px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modal-in .22s ease;
+}
+@keyframes modal-in { from { opacity:0; transform: translateY(20px) scale(.97); } to { opacity:1; transform: none; } }
+.modal-header {
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid var(--bg-muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-title { font-family: 'Libre Baskerville', serif; font-size: 18px; }
+.modal-body { padding: 22px 24px; }
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--bg-muted);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* ── FORM ────────────────────────────────────── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1 / -1; }
+label { font-size: 12px; font-weight: 600; color: var(--dark); }
+input, select, textarea {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  color: var(--dark);
+  background: var(--bg-card);
+  border: 1px solid var(--bg-muted);
+  border-radius: 8px;
+  padding: 10px 13px;
+  outline: none;
+  width: 100%;
+  transition: border-color .18s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--sidebar); }
+textarea { resize: vertical; min-height: 80px; }
+select { appearance: none; cursor: pointer; }
+
+/* ── DETAIL PANEL ────────────────────────────── */
+.detail-panel {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 440px;
+  background: var(--white);
+  border-left: 1px solid var(--bg-muted);
+  box-shadow: -4px 0 24px rgba(45,31,14,.12);
+  z-index: 150;
+  transform: translateX(100%);
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.detail-panel.open { transform: translateX(0); }
+.detail-panel-header {
+  padding: 22px 22px 18px;
+  border-bottom: 1px solid var(--bg-muted);
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.detail-avatar {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--sidebar);
+  color: #fff;
+  font-weight: 700;
+  font-size: 20px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.detail-panel-info { flex: 1; min-width: 0; }
+.detail-name { font-family: 'Libre Baskerville', serif; font-size: 18px; margin-bottom: 4px; }
+.detail-panel-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--taupe);
+  padding: 4px;
+  border-radius: 6px;
+  transition: background .15s;
+}
+.detail-panel-close:hover { background: var(--bg-card); color: var(--dark); }
+.detail-panel-body { padding: 20px 22px; overflow-y: auto; flex: 1; }
+.detail-section { margin-bottom: 22px; }
+.detail-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--taupe);
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--bg-card);
+}
+.detail-field { display: flex; gap: 8px; margin-bottom: 10px; align-items: flex-start; }
+.detail-field-label { font-size: 12px; color: var(--taupe); min-width: 110px; padding-top: 1px; }
+.detail-field-value { font-size: 13px; font-weight: 500; flex: 1; }
+
+.notes-list { display: flex; flex-direction: column; gap: 8px; }
+.note-item {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.note-text { font-size: 13px; margin-bottom: 4px; }
+.note-date { font-size: 11px; color: var(--taupe); }
+
+.note-input-wrap { display: flex; gap: 8px; margin-top: 10px; }
+.note-input-wrap input { flex: 1; }
+
+/* ── STATUS SELECT ───────────────────────────── */
+.status-select-wrap { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.status-btn {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all .15s;
+  background: var(--bg-card);
+  color: var(--taupe);
+}
+.status-btn:hover { border-color: var(--bg-muted); }
+.status-btn.active[data-status="novo"]      { background: rgba(152,134,122,.2); color: var(--taupe); border-color: var(--taupe); }
+.status-btn.active[data-status="avaliacao"] { background: rgba(132,83,16,.15); color: var(--gold); border-color: var(--gold); }
+.status-btn.active[data-status="agendado"]  { background: rgba(101,90,60,.15); color: var(--olive); border-color: var(--olive); }
+.status-btn.active[data-status="paciente"]  { background: rgba(74,124,89,.15); color: var(--success); border-color: var(--success); }
+.status-btn.active[data-status="inativo"]   { background: rgba(185,64,64,.12); color: var(--danger); border-color: var(--danger); }
+
+/* ── FILTERS BAR ─────────────────────────────── */
+.filters-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.filter-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid var(--bg-muted);
+  background: var(--white);
+  color: var(--taupe);
+  transition: all .15s;
+}
+.filter-pill:hover { border-color: var(--sidebar); color: var(--sidebar); }
+.filter-pill.active { background: var(--sidebar); color: #fff; border-color: var(--sidebar); }
+.filters-bar .spacer { flex: 1; }
+
+/* ── EMPTY STATE ─────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--taupe);
+}
+.empty-state svg { opacity: .35; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+
+/* ── TOAST ───────────────────────────────────── */
+#toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.toast {
+  background: var(--dark);
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  box-shadow: var(--shadow-md);
+  animation: toast-in .25s ease;
+  max-width: 320px;
+}
+@keyframes toast-in { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: none; } }
+.toast.success { background: var(--success); }
+.toast.error   { background: var(--danger); }
+
+/* ── UTILITIES ───────────────────────────────── */
+.flex { display: flex; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.mt-16 { margin-top: 16px; }
+.text-muted { color: var(--taupe); font-size: 12px; }
+.fw-600 { font-weight: 600; }
+.close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--taupe);
+  display: flex;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background .15s;
+}
+.close-btn:hover { background: var(--bg-card); color: var(--dark); }
+
+/* Quick action strip */
+.quick-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.quick-action {
+  flex: 1;
+  background: var(--white);
+  border: 1px solid var(--bg-muted);
+  border-radius: var(--r-lg);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: box-shadow .18s, transform .18s;
+}
+.quick-action:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.quick-action-icon {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.quick-action-text { font-size: 13px; font-weight: 600; color: var(--dark); }
+.quick-action-sub  { font-size: 11.5px; color: var(--taupe); margin-top: 2px; }
+
+/* Goal tag */
+.goal-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(101,90,60,.1);
+  color: var(--olive);
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  margin: 2px;
+}
+
+/* Panel footer actions */
+.detail-panel-footer {
+  padding: 14px 22px;
+  border-top: 1px solid var(--bg-muted);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+</style>
+</head>
+
+<body>
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <img src="logo-carol.png" alt="Carol Nutri" />
+  </div>
+  <div class="sidebar-section-label">Menu Principal</div>
+  <nav>
+    <a href="#" class="active" data-page="dashboard">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a href="#" data-page="pipeline">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 17H5a2 2 0 00-2 2v0a2 2 0 002 2h4a2 2 0 002-2v0a2 2 0 00-2-2z"/><path d="M9 7H5a2 2 0 00-2 2v0a2 2 0 002 2h4a2 2 0 002-2v0a2 2 0 00-2-2z"/><path d="M19 17h-4a2 2 0 00-2 2v0a2 2 0 002 2h4a2 2 0 002-2v0a2 2 0 00-2-2z"/><path d="M19 7h-4a2 2 0 00-2 2v0a2 2 0 002 2h4a2 2 0 002-2v0a2 2 0 00-2-2z"/></svg>
+      Pipeline de Leads
+    </a>
+    <a href="#" data-page="patients">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      Pacientes
+    </a>
+    <a href="#" data-page="agenda">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Agenda
+    </a>
+  </nav>
+  <div class="sidebar-section-label">Configurações</div>
+  <nav>
+    <a href="#" data-page="settings">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Configurações
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    Carol Nutri CRM &copy; 2025
+  </div>
+</aside>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<div id="main">
+  <!-- TOPBAR -->
+  <header id="topbar">
+    <div class="topbar-title" id="topbar-title">Dashboard</div>
+    <div class="topbar-spacer"></div>
+    <div class="search-box">
+      <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="color:var(--taupe);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="global-search" placeholder="Buscar contatos, pacientes…" />
+    </div>
+    <button class="btn btn-primary" id="btn-new-lead">
+      <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      Novo Contato
+    </button>
+  </header>
+
+  <!-- CONTENT -->
+  <div id="content">
+
+    <!-- ────────── DASHBOARD ────────── -->
+    <div class="page active" id="page-dashboard">
+      <div class="kpi-grid" id="kpi-grid"></div>
+
+      <div class="quick-actions">
+        <div class="quick-action" onclick="openNewLeadModal()">
+          <div class="quick-action-icon" style="background:rgba(96,47,25,.1);">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="var(--sidebar)" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+          </div>
+          <div><div class="quick-action-text">Novo Contato</div><div class="quick-action-sub">Registrar lead recebido</div></div>
+        </div>
+        <div class="quick-action" onclick="openNewApptModal()">
+          <div class="quick-action-icon" style="background:rgba(132,83,16,.1);">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="var(--gold)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
+          </div>
+          <div><div class="quick-action-text">Agendar Consulta</div><div class="quick-action-sub">Marcar horário</div></div>
+        </div>
+        <div class="quick-action" onclick="navigate('pipeline')">
+          <div class="quick-action-icon" style="background:rgba(101,90,60,.1);">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="var(--olive)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <div><div class="quick-action-text">Ver Pipeline</div><div class="quick-action-sub">Acompanhar funil</div></div>
+        </div>
+        <div class="quick-action" onclick="navigate('patients')">
+          <div class="quick-action-icon" style="background:rgba(74,124,89,.1);">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="var(--success)" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <div><div class="quick-action-text">Pacientes Ativos</div><div class="quick-action-sub">Lista completa</div></div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="card">
+          <div class="section-header">
+            <div class="section-title">Contatos Recentes <small>últimos adicionados</small></div>
+            <button class="btn btn-secondary btn-sm" onclick="navigate('pipeline')">Ver todos</button>
+          </div>
+          <div id="dash-recent-leads"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div class="card">
+            <div class="section-header">
+              <div class="section-title">Próximas Consultas</div>
+              <button class="btn btn-secondary btn-sm" onclick="navigate('agenda')">Agenda</button>
+            </div>
+            <div id="dash-upcoming-appts"></div>
+          </div>
+          <div class="card">
+            <div class="section-header">
+              <div class="section-title">Origem dos Contatos</div>
+            </div>
+            <div class="source-list" id="dash-sources"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ────────── PIPELINE ────────── -->
+    <div class="page" id="page-pipeline">
+      <div class="pipeline-header">
+        <div>
+          <div class="section-title" style="font-family:'Libre Baskerville',serif;font-size:20px;">Pipeline de Leads</div>
+          <p class="text-muted" style="margin-top:4px;">Arraste os cards entre as colunas para avançar no funil.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openNewLeadModal()">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Novo Contato
+        </button>
+      </div>
+      <div class="pipeline-board" id="pipeline-board"></div>
+    </div>
+
+    <!-- ────────── PATIENTS ────────── -->
+    <div class="page" id="page-patients">
+      <div class="section-header" style="margin-bottom:18px;">
+        <div>
+          <div class="section-title" style="font-family:'Libre Baskerville',serif;font-size:20px;">Pacientes</div>
+          <p class="text-muted" style="margin-top:4px;">Contatos convertidos em pacientes ativos.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openNewLeadModal('paciente')">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Novo Paciente
+        </button>
+      </div>
+      <div class="filters-bar">
+        <button class="filter-pill active" data-pfilter="all">Todos</button>
+        <button class="filter-pill" data-pfilter="paciente">Ativos</button>
+        <button class="filter-pill" data-pfilter="inativo">Inativos</button>
+        <div class="spacer"></div>
+        <div class="search-box" style="width:220px;">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="color:var(--taupe);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="patient-search" placeholder="Buscar paciente…" />
+        </div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="table-wrap">
+          <table id="patients-table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Telefone</th>
+                <th>Objetivo</th>
+                <th>Próxima Consulta</th>
+                <th>Origem</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="patients-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ────────── AGENDA ────────── -->
+    <div class="page" id="page-agenda">
+      <div class="section-header" style="margin-bottom:20px;">
+        <div>
+          <div class="section-title" style="font-family:'Libre Baskerville',serif;font-size:20px;">Agenda</div>
+          <p class="text-muted" style="margin-top:4px;">Gerencie consultas e compromissos.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openNewApptModal()">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Novo Agendamento
+        </button>
+      </div>
+      <div class="calendar-grid">
+        <div class="card">
+          <div class="cal-header">
+            <span class="cal-month-name" id="cal-month-name"></span>
+            <div class="cal-nav">
+              <button onclick="calNav(-1)">&#8249;</button>
+              <button onclick="calNav(1)">&#8250;</button>
+            </div>
+          </div>
+          <div class="cal-days-header">
+            <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span>
+            <span>Qui</span><span>Sex</span><span>Sáb</span>
+          </div>
+          <div class="cal-days" id="cal-days"></div>
+        </div>
+        <div>
+          <div class="section-header"><div class="section-title" id="cal-day-title">Hoje</div></div>
+          <div class="agenda-events" id="agenda-events-list"></div>
+          <div class="empty-state" id="agenda-empty" style="display:none;">
+            <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="display:block;margin:0 auto 12px;"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <p>Nenhum agendamento neste dia.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ────────── SETTINGS ────────── -->
+    <div class="page" id="page-settings">
+      <div class="section-title" style="font-family:'Libre Baskerville',serif;font-size:20px;margin-bottom:20px;">Configurações</div>
+      <div class="card" style="max-width:500px;">
+        <div class="section-header" style="margin-bottom:16px;"><div class="section-title">Informações da Nutricionista</div></div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Nome completo</label>
+            <input type="text" id="cfg-name" placeholder="Ex.: Carolina Massmann" />
+          </div>
+          <div class="form-group">
+            <label>CRN</label>
+            <input type="text" id="cfg-crn" placeholder="Ex.: CRN-2 12345" />
+          </div>
+          <div class="form-group">
+            <label>Telefone/WhatsApp</label>
+            <input type="text" id="cfg-phone" placeholder="(XX) XXXXX-XXXX" />
+          </div>
+          <div class="form-group full">
+            <label>E-mail profissional</label>
+            <input type="email" id="cfg-email" placeholder="contato@carolnutri.com.br" />
+          </div>
+        </div>
+        <div style="margin-top:18px;display:flex;justify-content:flex-end;">
+          <button class="btn btn-primary" onclick="saveSettings()">Salvar Configurações</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ═══════════════ MODAL: NOVO LEAD ═══════════════ -->
+<div class="modal-overlay" id="modal-lead-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-lead-title">Novo Contato</span>
+      <button class="close-btn" onclick="closeModal('modal-lead-overlay')">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Nome completo *</label>
+          <input type="text" id="f-name" placeholder="Nome da pessoa" />
+        </div>
+        <div class="form-group">
+          <label>Telefone / WhatsApp *</label>
+          <input type="text" id="f-phone" placeholder="(XX) XXXXX-XXXX" />
+        </div>
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" id="f-email" placeholder="email@exemplo.com" />
+        </div>
+        <div class="form-group">
+          <label>Origem do contato</label>
+          <select id="f-source">
+            <option value="Instagram">Instagram</option>
+            <option value="Indicação">Indicação</option>
+            <option value="Site">Site</option>
+            <option value="WhatsApp">WhatsApp direto</option>
+            <option value="Google">Google</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Objetivo principal</label>
+          <select id="f-goal">
+            <option value="Emagrecimento">Emagrecimento</option>
+            <option value="Ganho de massa">Ganho de massa</option>
+            <option value="Saúde geral">Saúde geral</option>
+            <option value="Reeducação alimentar">Reeducação alimentar</option>
+            <option value="Tratamento clínico">Tratamento clínico</option>
+            <option value="Gestante/lactante">Gestante / lactante</option>
+            <option value="Esportivo">Performance esportiva</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status no funil</label>
+          <select id="f-status">
+            <option value="novo">Novo Contato</option>
+            <option value="avaliacao">Em Avaliação</option>
+            <option value="agendado">Consulta Agendada</option>
+            <option value="paciente">Paciente Ativo</option>
+            <option value="inativo">Inativo</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Próxima consulta</label>
+          <input type="datetime-local" id="f-next-appt" />
+        </div>
+        <div class="form-group full">
+          <label>Anotações iniciais</label>
+          <textarea id="f-notes" placeholder="Observações sobre o contato, histórico, restrições…"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-lead-overlay')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-save-lead" onclick="saveLead()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: AGENDAMENTO ═══════════════ -->
+<div class="modal-overlay" id="modal-appt-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-appt-title">Novo Agendamento</span>
+      <button class="close-btn" onclick="closeModal('modal-appt-overlay')">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Paciente / Contato</label>
+          <select id="fa-contact"></select>
+        </div>
+        <div class="form-group">
+          <label>Data e hora *</label>
+          <input type="datetime-local" id="fa-datetime" />
+        </div>
+        <div class="form-group">
+          <label>Tipo de consulta</label>
+          <select id="fa-type">
+            <option value="Consulta inicial">Consulta inicial</option>
+            <option value="Retorno">Retorno</option>
+            <option value="Avaliação">Avaliação</option>
+            <option value="Online">Online</option>
+            <option value="Emergência">Emergência</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Duração estimada</label>
+          <select id="fa-duration">
+            <option value="30 min">30 min</option>
+            <option value="45 min">45 min</option>
+            <option value="1 hora" selected>1 hora</option>
+            <option value="1h30">1h30</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Observações</label>
+          <textarea id="fa-notes" placeholder="Pautas, exames a revisar…"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-appt-overlay')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveAppt()">Confirmar Agendamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ DETAIL PANEL ═══════════════ -->
+<div class="detail-panel" id="detail-panel">
+  <div class="detail-panel-header">
+    <div class="detail-avatar" id="dp-avatar">–</div>
+    <div class="detail-panel-info">
+      <div class="detail-name" id="dp-name">–</div>
+      <div id="dp-badge"></div>
+      <div class="text-muted" style="margin-top:4px;" id="dp-phone">–</div>
+    </div>
+    <button class="detail-panel-close" onclick="closeDetail()">
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="detail-panel-body">
+    <!-- Status -->
+    <div class="detail-section">
+      <div class="detail-section-title">Estágio no Funil</div>
+      <div class="status-select-wrap" id="dp-status-wrap"></div>
+    </div>
+    <!-- Info -->
+    <div class="detail-section">
+      <div class="detail-section-title">Informações</div>
+      <div class="detail-field"><span class="detail-field-label">E-mail</span><span class="detail-field-value" id="dp-email">–</span></div>
+      <div class="detail-field"><span class="detail-field-label">Objetivo</span><span class="detail-field-value" id="dp-goal">–</span></div>
+      <div class="detail-field"><span class="detail-field-label">Origem</span><span class="detail-field-value" id="dp-source">–</span></div>
+      <div class="detail-field"><span class="detail-field-label">Próx. consulta</span><span class="detail-field-value" id="dp-appt">–</span></div>
+      <div class="detail-field"><span class="detail-field-label">Cadastrado em</span><span class="detail-field-value" id="dp-created">–</span></div>
+    </div>
+    <!-- Notes -->
+    <div class="detail-section">
+      <div class="detail-section-title">Histórico de Notas</div>
+      <div class="notes-list" id="dp-notes-list"></div>
+      <div class="note-input-wrap">
+        <input type="text" id="dp-note-input" placeholder="Adicionar anotação…" onkeydown="if(event.key==='Enter')addNote()" />
+        <button class="btn btn-secondary btn-sm" onclick="addNote()">Salvar</button>
+      </div>
+    </div>
+    <!-- Appointments -->
+    <div class="detail-section" id="dp-appts-section">
+      <div class="detail-section-title">Consultas</div>
+      <div id="dp-appts-list"></div>
+    </div>
+  </div>
+  <div class="detail-panel-footer">
+    <button class="btn btn-olive btn-sm" onclick="editLead()">
+      <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Editar
+    </button>
+    <button class="btn btn-secondary btn-sm" onclick="openNewApptModalForContact()">
+      <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M8 18h.01"/></svg>
+      Agendar
+    </button>
+    <div style="flex:1;"></div>
+    <button class="btn btn-danger btn-sm" onclick="deleteLead()">
+      <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+      Excluir
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════ TOAST ═══════════════ -->
+<div id="toast-container"></div>
+
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+<script>
+// ─── DATA STORE ──────────────────────────────────────────────────────────────
+let DB = {
+  leads: [],
+  appointments: [],
+  settings: { name: 'Carolina', crn: '', phone: '', email: '' },
+  nextId: 1
+};
+
+function loadDB() {
+  try {
+    const saved = localStorage.getItem('carolnutri-crm');
+    if (saved) DB = JSON.parse(saved);
+  } catch(e) {}
+  if (!DB.leads)        DB.leads = [];
+  if (!DB.appointments) DB.appointments = [];
+  if (!DB.settings)     DB.settings = { name: 'Carolina', crn: '', phone: '', email: '' };
+  if (!DB.nextId)       DB.nextId = 1;
+}
+
+function saveDB() {
+  localStorage.setItem('carolnutri-crm', JSON.stringify(DB));
+}
+
+function newId() { return DB.nextId++; }
+
+// ─── SEED DATA ────────────────────────────────────────────────────────────────
+function seedData() {
+  if (DB.leads.length > 0) return;
+  const now = new Date();
+  const leads = [
+    { id: newId(), name: 'Ana Paula Rodrigues', phone: '(51) 99123-4567', email: 'anapaula@email.com', source: 'Instagram', goal: 'Emagrecimento', status: 'novo', notes: [{ text: 'Interessada no programa de 3 meses. Enviou mensagem pelo direct.', date: fmtDateTime(now) }], nextAppt: null, createdAt: fmtDate(new Date(Date.now() - 2*86400000)) },
+    { id: newId(), name: 'Mariana Costa', phone: '(51) 98765-4321', email: 'mariana.costa@email.com', source: 'Indicação', goal: 'Reeducação alimentar', status: 'avaliacao', notes: [{ text: 'Indicação da paciente Juliana. Tem intolerância à lactose.', date: fmtDateTime(new Date(Date.now() - 86400000)) }], nextAppt: null, createdAt: fmtDate(new Date(Date.now() - 5*86400000)) },
+    { id: newId(), name: 'Fernanda Lima', phone: '(51) 97654-3210', email: 'fernanda.lima@email.com', source: 'Google', goal: 'Tratamento clínico', status: 'agendado', notes: [{ text: 'Paciente com hipotireoidismo. Aguardando exames.', date: fmtDateTime(new Date(Date.now() - 3*86400000)) }], nextAppt: fmtLocalDateTime(new Date(Date.now() + 2*86400000)), createdAt: fmtDate(new Date(Date.now() - 8*86400000)) },
+    { id: newId(), name: 'Juliana Martins', phone: '(51) 96543-2109', email: 'juliana.m@email.com', source: 'Indicação', goal: 'Ganho de massa', status: 'paciente', notes: [{ text: 'Atleta de crossfit, treina 5x semana.', date: fmtDateTime(new Date(Date.now() - 20*86400000)) }], nextAppt: fmtLocalDateTime(new Date(Date.now() + 5*86400000)), createdAt: fmtDate(new Date(Date.now() - 30*86400000)) },
+    { id: newId(), name: 'Camila Pereira', phone: '(51) 95432-1098', email: 'camila.p@gmail.com', source: 'Instagram', goal: 'Emagrecimento', status: 'paciente', notes: [{ text: 'Ótima adesão ao plano alimentar. Perdeu 4kg no 1º mês.', date: fmtDateTime(new Date(Date.now() - 10*86400000)) }], nextAppt: fmtLocalDateTime(new Date(Date.now() + 3*86400000)), createdAt: fmtDate(new Date(Date.now() - 45*86400000)) },
+    { id: newId(), name: 'Roberta Santos', phone: '(51) 94321-0987', email: '', source: 'WhatsApp', goal: 'Gestante/lactante', status: 'avaliacao', notes: [], nextAppt: null, createdAt: fmtDate(new Date(Date.now() - 1*86400000)) },
+    { id: newId(), name: 'Patricia Alves', phone: '(51) 93210-9876', email: 'patricia.a@email.com', source: 'Site', goal: 'Saúde geral', status: 'inativo', notes: [{ text: 'Pausou consultas por questões financeiras. Pode retornar em 2025.', date: fmtDateTime(new Date(Date.now() - 60*86400000)) }], nextAppt: null, createdAt: fmtDate(new Date(Date.now() - 90*86400000)) },
+  ];
+  DB.leads = leads;
+
+  const appts = [
+    { id: newId(), contactId: leads[2].id, contactName: leads[2].name, datetime: leads[2].nextAppt, type: 'Consulta inicial', duration: '1 hora', notes: 'Trazer exames de sangue.' },
+    { id: newId(), contactId: leads[3].id, contactName: leads[3].name, datetime: leads[3].nextAppt, type: 'Retorno', duration: '45 min', notes: '' },
+    { id: newId(), contactId: leads[4].id, contactName: leads[4].name, datetime: leads[4].nextAppt, type: 'Retorno', duration: '1 hora', notes: 'Revisar plano alimentar.' },
+  ];
+  DB.appointments = appts;
+  saveDB();
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+function fmtDate(d) { return d.toLocaleDateString('pt-BR'); }
+function fmtDateTime(d) { return d.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }); }
+function fmtLocalDateTime(d) {
+  const pad = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function initials(name) {
+  const parts = name.trim().split(' ');
+  if (parts.length === 1) return parts[0][0].toUpperCase();
+  return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+}
+
+const avatarColors = ['', 'olive', 'gold', 'taupe', 'success'];
+function avatarColor(id) { return avatarColors[id % avatarColors.length]; }
+
+const statusLabels = { novo: 'Novo Contato', avaliacao: 'Em Avaliação', agendado: 'Consulta Agendada', paciente: 'Paciente Ativo', inativo: 'Inativo' };
+function statusBadge(s) { return `<span class="badge badge-${s}">${statusLabels[s]||s}</span>`; }
+function statusBadgeSm(s) { return `<span class="badge badge-${s} badge-sm">${statusLabels[s]||s}</span>`; }
+
+function toast(msg, type='') {
+  const t = document.createElement('div');
+  t.className = 'toast' + (type ? ' '+type : '');
+  t.textContent = msg;
+  document.getElementById('toast-container').appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// ─── NAVIGATION ───────────────────────────────────────────────────────────────
+let currentPage = 'dashboard';
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  const el = document.getElementById('page-' + page);
+  if (el) el.classList.add('active');
+  const link = document.querySelector(`nav a[data-page="${page}"]`);
+  if (link) link.classList.add('active');
+  currentPage = page;
+  const titles = { dashboard: 'Dashboard', pipeline: 'Pipeline de Leads', patients: 'Pacientes', agenda: 'Agenda', settings: 'Configurações' };
+  document.getElementById('topbar-title').textContent = titles[page] || page;
+  if (page === 'dashboard')  renderDashboard();
+  if (page === 'pipeline')   renderPipeline();
+  if (page === 'patients')   renderPatients();
+  if (page === 'agenda')     { renderCalendar(); renderAgendaEvents(); }
+  if (page === 'settings')   loadSettings();
+}
+
+document.querySelectorAll('nav a').forEach(a => {
+  a.addEventListener('click', e => { e.preventDefault(); navigate(a.dataset.page); });
+});
+
+// ─── DASHBOARD ────────────────────────────────────────────────────────────────
+function renderDashboard() {
+  const leads = DB.leads;
+  const total = leads.length;
+  const patients = leads.filter(l => l.status === 'paciente').length;
+  const pipeline = leads.filter(l => ['novo','avaliacao','agendado'].includes(l.status)).length;
+  const upcoming = DB.appointments.filter(a => new Date(a.datetime) >= new Date()).length;
+  const convRate = total > 0 ? Math.round(patients / total * 100) : 0;
+
+  document.getElementById('kpi-grid').innerHTML = `
+    <div class="kpi-card">
+      <div class="kpi-icon burgundy"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+      <div class="kpi-label">Total de Contatos</div>
+      <div class="kpi-value">${total}</div>
+      <div class="kpi-sub">cadastrados no CRM</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon gold"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+      <div class="kpi-label">Em Pipeline</div>
+      <div class="kpi-value">${pipeline}</div>
+      <div class="kpi-sub">leads em progresso</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon olive"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+      <div class="kpi-label">Pacientes Ativos</div>
+      <div class="kpi-value">${patients}</div>
+      <div class="kpi-sub">conversão: ${convRate}%</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon taupe"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+      <div class="kpi-label">Próximas Consultas</div>
+      <div class="kpi-value">${upcoming}</div>
+      <div class="kpi-sub">agendamentos futuros</div>
+    </div>
+  `;
+
+  // Recent leads
+  const recent = [...leads].sort((a,b) => b.id - a.id).slice(0, 6);
+  const cont = document.getElementById('dash-recent-leads');
+  if (!recent.length) {
+    cont.innerHTML = '<div class="empty-state"><p>Nenhum contato cadastrado ainda.</p></div>';
+  } else {
+    cont.innerHTML = recent.map(l => `
+      <div class="lead-row" onclick="openDetail(${l.id})">
+        <div class="avatar ${avatarColor(l.id)}">${initials(l.name)}</div>
+        <div class="lead-info">
+          <div class="lead-name">${l.name}</div>
+          <div class="lead-meta">${l.phone} · ${l.goal}</div>
+        </div>
+        ${statusBadgeSm(l.status)}
+      </div>
+    `).join('');
+  }
+
+  // Upcoming appointments
+  const now = new Date();
+  const upcomingAppts = DB.appointments
+    .filter(a => new Date(a.datetime) >= now)
+    .sort((a,b) => new Date(a.datetime) - new Date(b.datetime))
+    .slice(0, 4);
+  const apptCont = document.getElementById('dash-upcoming-appts');
+  if (!upcomingAppts.length) {
+    apptCont.innerHTML = '<div class="empty-state"><p>Sem consultas agendadas.</p></div>';
+  } else {
+    apptCont.innerHTML = upcomingAppts.map(a => {
+      const d = new Date(a.datetime);
+      return `<div class="appt-item">
+        <div class="appt-date-box">
+          <div class="appt-day">${d.getDate()}</div>
+          <div class="appt-month">${d.toLocaleString('pt-BR',{month:'short'}).replace('.','')}</div>
+        </div>
+        <div class="appt-info">
+          <div class="appt-name">${a.contactName}</div>
+          <div class="appt-time">${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})} · ${a.duration}</div>
+          <div class="appt-type">${a.type}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Sources
+  const sourceCounts = {};
+  leads.forEach(l => { sourceCounts[l.source] = (sourceCounts[l.source]||0)+1; });
+  const sorted = Object.entries(sourceCounts).sort((a,b)=>b[1]-a[1]);
+  const max = sorted[0]?.[1] || 1;
+  const barColors = ['#602F19','#655A3C','#845310','#98867A','#D6CDC8'];
+  document.getElementById('dash-sources').innerHTML = sorted.map(([src, cnt], i) => `
+    <div class="source-item">
+      <span class="source-label">${src}</span>
+      <div class="source-bar-wrap">
+        <div class="source-bar" style="width:${Math.round(cnt/max*100)}%;background:${barColors[i%barColors.length]}"></div>
+      </div>
+      <span class="source-count">${cnt}</span>
+    </div>
+  `).join('') || '<div class="text-muted">Sem dados ainda.</div>';
+}
+
+// ─── PIPELINE ─────────────────────────────────────────────────────────────────
+const columns = [
+  { key: 'novo',      label: 'Novo Contato',      cls: 'col-novo' },
+  { key: 'avaliacao', label: 'Em Avaliação',       cls: 'col-avaliacao' },
+  { key: 'agendado',  label: 'Consulta Agendada',  cls: 'col-agendado' },
+  { key: 'paciente',  label: 'Paciente Ativo',     cls: 'col-paciente' },
+];
+
+function renderPipeline() {
+  const board = document.getElementById('pipeline-board');
+  board.innerHTML = columns.map(col => {
+    const cards = DB.leads.filter(l => l.status === col.key);
+    return `
+      <div class="kanban-col ${col.cls}" data-col="${col.key}">
+        <div class="kanban-col-header">
+          <span class="kanban-col-title">${col.label}</span>
+          <span class="kanban-count">${cards.length}</span>
+        </div>
+        <div class="kanban-cards" id="col-${col.key}">
+          ${cards.map(l => kanbanCard(l)).join('')}
+        </div>
+        <div class="kanban-add" onclick="openNewLeadModal('${col.key}')">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Adicionar
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function kanbanCard(l) {
+  const hasAppt = l.nextAppt;
+  let apptStr = '';
+  if (hasAppt) {
+    const d = new Date(l.nextAppt);
+    apptStr = `<span class="kanban-card-date">📅 ${d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}</span>`;
+  }
+  return `
+    <div class="kanban-card" onclick="openDetail(${l.id})">
+      <div class="kanban-card-name">${l.name}</div>
+      <div class="kanban-card-goal">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        ${l.goal}
+      </div>
+      <div class="kanban-card-footer">
+        <span class="kanban-card-source">${l.source}</span>
+        ${apptStr}
+      </div>
+    </div>
+  `;
+}
+
+// ─── PATIENTS ─────────────────────────────────────────────────────────────────
+let patientFilter = 'all';
+function renderPatients(search = '') {
+  let list = DB.leads.filter(l => {
+    if (patientFilter === 'paciente') return l.status === 'paciente';
+    if (patientFilter === 'inativo')  return l.status === 'inativo';
+    return l.status === 'paciente' || l.status === 'inativo' || true;
+  });
+  if (search) {
+    const q = search.toLowerCase();
+    list = list.filter(l => l.name.toLowerCase().includes(q) || l.phone.includes(q) || l.email.toLowerCase().includes(q));
+  }
+
+  const tbody = document.getElementById('patients-tbody');
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><p>Nenhum resultado encontrado.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(l => {
+    let apptStr = '–';
+    if (l.nextAppt) {
+      const d = new Date(l.nextAppt);
+      apptStr = d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    }
+    return `
+      <tr onclick="openDetail(${l.id})">
+        <td><div class="td-flex"><div class="avatar ${avatarColor(l.id)}" style="width:32px;height:32px;font-size:12px;">${initials(l.name)}</div>${l.name}</div></td>
+        <td>${l.phone}</td>
+        <td><span class="goal-tag">${l.goal}</span></td>
+        <td>${apptStr}</td>
+        <td>${l.source}</td>
+        <td>${statusBadge(l.status)}</td>
+        <td><button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();openDetail(${l.id})">Ver</button></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+document.querySelectorAll('[data-pfilter]').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('[data-pfilter]').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    patientFilter = b.dataset.pfilter;
+    renderPatients(document.getElementById('patient-search').value);
+  });
+});
+document.getElementById('patient-search').addEventListener('input', e => {
+  renderPatients(e.target.value);
+});
+
+// ─── AGENDA / CALENDAR ────────────────────────────────────────────────────────
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+let calSelectedDate = null;
+
+function calNav(dir) { calMonth += dir; if (calMonth > 11) { calMonth=0; calYear++; } if (calMonth < 0) { calMonth=11; calYear--; } renderCalendar(); renderAgendaEvents(); }
+
+function renderCalendar() {
+  const monthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  document.getElementById('cal-month-name').textContent = `${monthNames[calMonth]} ${calYear}`;
+
+  const today = new Date();
+  const first = new Date(calYear, calMonth, 1);
+  const last  = new Date(calYear, calMonth+1, 0);
+  const startDay = first.getDay();
+
+  // Build date→has-event map
+  const apptDates = new Set(DB.appointments.map(a => {
+    const d = new Date(a.datetime);
+    return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+  }));
+
+  let html = '';
+  // Prev month padding
+  for (let i = 0; i < startDay; i++) {
+    const d = new Date(calYear, calMonth, -startDay+1+i);
+    html += `<div class="cal-day other-month"><span>${d.getDate()}</span></div>`;
+  }
+  // Current month
+  for (let d = 1; d <= last.getDate(); d++) {
+    const key = `${calYear}-${calMonth}-${d}`;
+    const isToday = today.getFullYear()===calYear && today.getMonth()===calMonth && today.getDate()===d;
+    const isSelected = calSelectedDate && calSelectedDate.y===calYear && calSelectedDate.m===calMonth && calSelectedDate.d===d;
+    const hasEv = apptDates.has(key);
+    html += `<div class="cal-day${isToday?' today':''}${isSelected?' selected':''}${hasEv?' has-event':''}" onclick="selectDay(${d})">${d}</div>`;
+  }
+  document.getElementById('cal-days').innerHTML = html;
+}
+
+function selectDay(d) {
+  calSelectedDate = { y: calYear, m: calMonth, d };
+  renderCalendar();
+  renderAgendaEvents();
+}
+
+function renderAgendaEvents() {
+  const sel = calSelectedDate;
+  let appts;
+  let title;
+  if (!sel) {
+    const now = new Date();
+    appts = DB.appointments.filter(a => {
+      const d = new Date(a.datetime);
+      return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth() && d.getDate()===now.getDate();
+    });
+    title = 'Hoje';
+  } else {
+    appts = DB.appointments.filter(a => {
+      const d = new Date(a.datetime);
+      return d.getFullYear()===sel.y && d.getMonth()===sel.m && d.getDate()===sel.d;
+    });
+    title = `${String(sel.d).padStart(2,'0')}/${String(sel.m+1).padStart(2,'0')}/${sel.y}`;
+  }
+  document.getElementById('cal-day-title').textContent = title;
+  appts.sort((a,b) => new Date(a.datetime)-new Date(b.datetime));
+
+  const colors = ['#602F19','#655A3C','#845310','#98867A'];
+  const list = document.getElementById('agenda-events-list');
+  const empty = document.getElementById('agenda-empty');
+  if (!appts.length) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  list.innerHTML = appts.map((a, i) => {
+    const d = new Date(a.datetime);
+    const time = d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    return `
+      <div class="agenda-event" onclick="openDetail(${a.contactId})">
+        <div class="agenda-event-dot" style="background:${colors[i%colors.length]}"></div>
+        <div class="agenda-event-body">
+          <div class="agenda-event-name">${a.contactName}</div>
+          <div class="agenda-event-time">${time} · ${a.duration} · ${a.type}</div>
+          ${a.notes ? `<div class="text-muted" style="margin-top:2px;">${a.notes}</div>` : ''}
+        </div>
+        <div class="agenda-event-actions">
+          <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();deleteAppt(${a.id})">Cancelar</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function deleteAppt(id) {
+  if (!confirm('Cancelar este agendamento?')) return;
+  DB.appointments = DB.appointments.filter(a => a.id !== id);
+  // Remove nextAppt from lead if matched
+  const appt = DB.appointments.find(a => a.id === id);
+  saveDB();
+  renderAgendaEvents();
+  renderCalendar();
+  toast('Agendamento cancelado.');
+}
+
+// ─── DETAIL PANEL ─────────────────────────────────────────────────────────────
+let detailLeadId = null;
+function openDetail(id) {
+  const l = DB.leads.find(x => x.id === id);
+  if (!l) return;
+  detailLeadId = id;
+
+  document.getElementById('dp-avatar').textContent = initials(l.name);
+  document.getElementById('dp-avatar').className = `detail-avatar ${avatarColor(l.id)}`;
+  document.getElementById('dp-name').textContent = l.name;
+  document.getElementById('dp-badge').innerHTML = statusBadge(l.status);
+  document.getElementById('dp-phone').textContent = l.phone;
+  document.getElementById('dp-email').textContent = l.email || '–';
+  document.getElementById('dp-goal').textContent = l.goal;
+  document.getElementById('dp-source').textContent = l.source;
+  document.getElementById('dp-created').textContent = l.createdAt;
+
+  // Next appt
+  if (l.nextAppt) {
+    const d = new Date(l.nextAppt);
+    document.getElementById('dp-appt').textContent = d.toLocaleDateString('pt-BR') + ' às ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  } else { document.getElementById('dp-appt').textContent = '–'; }
+
+  // Status buttons
+  const wrap = document.getElementById('dp-status-wrap');
+  wrap.innerHTML = Object.entries(statusLabels).map(([k,v]) =>
+    `<button class="status-btn${l.status===k?' active':''}" data-status="${k}" onclick="changeStatus('${k}')">${v}</button>`
+  ).join('');
+
+  // Notes
+  renderDetailNotes(l);
+
+  // Appointments
+  const appts = DB.appointments.filter(a => a.contactId === id).sort((a,b) => new Date(b.datetime)-new Date(a.datetime));
+  const apptList = document.getElementById('dp-appts-list');
+  apptList.innerHTML = appts.length ? appts.map(a => {
+    const d = new Date(a.datetime);
+    return `<div class="appt-item">
+      <div class="appt-date-box">
+        <div class="appt-day">${d.getDate()}</div>
+        <div class="appt-month">${d.toLocaleString('pt-BR',{month:'short'}).replace('.','')}</div>
+      </div>
+      <div class="appt-info">
+        <div class="appt-name">${a.type}</div>
+        <div class="appt-time">${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})} · ${a.duration}</div>
+        ${a.notes ? `<div class="text-muted">${a.notes}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('') : '<div class="text-muted">Sem consultas registradas.</div>';
+
+  document.getElementById('detail-panel').classList.add('open');
+}
+
+function renderDetailNotes(l) {
+  const list = document.getElementById('dp-notes-list');
+  if (!l.notes || !l.notes.length) {
+    list.innerHTML = '<div class="text-muted">Sem notas ainda.</div>';
+    return;
+  }
+  list.innerHTML = [...l.notes].reverse().map(n => `
+    <div class="note-item">
+      <div class="note-text">${n.text}</div>
+      <div class="note-date">${n.date}</div>
+    </div>
+  `).join('');
+}
+
+function closeDetail() { document.getElementById('detail-panel').classList.remove('open'); }
+
+function changeStatus(status) {
+  const l = DB.leads.find(x => x.id === detailLeadId);
+  if (!l) return;
+  l.status = status;
+  saveDB();
+  document.getElementById('dp-badge').innerHTML = statusBadge(status);
+  document.querySelectorAll('#dp-status-wrap .status-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.status === status);
+  });
+  toast(`Status atualizado: ${statusLabels[status]}`);
+  if (currentPage === 'pipeline') renderPipeline();
+  if (currentPage === 'dashboard') renderDashboard();
+  if (currentPage === 'patients') renderPatients();
+}
+
+function addNote() {
+  const input = document.getElementById('dp-note-input');
+  const text = input.value.trim();
+  if (!text) return;
+  const l = DB.leads.find(x => x.id === detailLeadId);
+  if (!l) return;
+  if (!l.notes) l.notes = [];
+  l.notes.push({ text, date: fmtDateTime(new Date()) });
+  saveDB();
+  renderDetailNotes(l);
+  input.value = '';
+  toast('Nota salva.');
+}
+
+function editLead() {
+  const l = DB.leads.find(x => x.id === detailLeadId);
+  if (!l) return;
+  openNewLeadModal(null, l);
+}
+
+function deleteLead() {
+  const l = DB.leads.find(x => x.id === detailLeadId);
+  if (!l || !confirm(`Excluir "${l.name}" permanentemente?`)) return;
+  DB.leads = DB.leads.filter(x => x.id !== detailLeadId);
+  DB.appointments = DB.appointments.filter(a => a.contactId !== detailLeadId);
+  saveDB();
+  closeDetail();
+  toast('Contato excluído.', 'error');
+  if (currentPage === 'pipeline') renderPipeline();
+  if (currentPage === 'dashboard') renderDashboard();
+  if (currentPage === 'patients') renderPatients();
+}
+
+// ─── MODAL: LEAD ──────────────────────────────────────────────────────────────
+let editingLeadId = null;
+function openNewLeadModal(preStatus, editLead) {
+  editingLeadId = editLead ? editLead.id : null;
+  document.getElementById('modal-lead-title').textContent = editLead ? 'Editar Contato' : 'Novo Contato';
+  document.getElementById('btn-save-lead').textContent = editLead ? 'Atualizar' : 'Salvar';
+  document.getElementById('f-name').value    = editLead?.name    || '';
+  document.getElementById('f-phone').value   = editLead?.phone   || '';
+  document.getElementById('f-email').value   = editLead?.email   || '';
+  document.getElementById('f-source').value  = editLead?.source  || 'Instagram';
+  document.getElementById('f-goal').value    = editLead?.goal    || 'Emagrecimento';
+  document.getElementById('f-status').value  = editLead?.status  || preStatus || 'novo';
+  document.getElementById('f-next-appt').value = editLead?.nextAppt || '';
+  document.getElementById('f-notes').value   = (editLead?.notes && editLead.notes.length) ? editLead.notes[0].text : '';
+  document.getElementById('modal-lead-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('f-name').focus(), 100);
+}
+
+function saveLead() {
+  const name = document.getElementById('f-name').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  if (!name || !phone) { toast('Preencha nome e telefone.', 'error'); return; }
+  const data = {
+    name, phone,
+    email:    document.getElementById('f-email').value.trim(),
+    source:   document.getElementById('f-source').value,
+    goal:     document.getElementById('f-goal').value,
+    status:   document.getElementById('f-status').value,
+    nextAppt: document.getElementById('f-next-appt').value || null,
+  };
+  if (editingLeadId) {
+    const l = DB.leads.find(x => x.id === editingLeadId);
+    if (l) Object.assign(l, data);
+    toast('Contato atualizado!', 'success');
+  } else {
+    const noteText = document.getElementById('f-notes').value.trim();
+    const l = {
+      id: newId(),
+      ...data,
+      notes: noteText ? [{ text: noteText, date: fmtDateTime(new Date()) }] : [],
+      createdAt: fmtDate(new Date()),
+    };
+    DB.leads.push(l);
+    toast('Contato cadastrado!', 'success');
+  }
+  saveDB();
+  closeModal('modal-lead-overlay');
+  if (currentPage === 'dashboard') renderDashboard();
+  if (currentPage === 'pipeline')  renderPipeline();
+  if (currentPage === 'patients')  renderPatients();
+  if (editingLeadId) openDetail(editingLeadId);
+}
+
+// ─── MODAL: APPOINTMENT ───────────────────────────────────────────────────────
+let apptPreContactId = null;
+function openNewApptModal() {
+  apptPreContactId = null;
+  fillContactSelect(null);
+  document.getElementById('fa-datetime').value = '';
+  document.getElementById('fa-notes').value = '';
+  document.getElementById('modal-appt-overlay').classList.add('open');
+}
+function openNewApptModalForContact() {
+  apptPreContactId = detailLeadId;
+  fillContactSelect(detailLeadId);
+  document.getElementById('fa-datetime').value = '';
+  document.getElementById('fa-notes').value = '';
+  document.getElementById('modal-appt-overlay').classList.add('open');
+}
+function fillContactSelect(selectedId) {
+  const sel = document.getElementById('fa-contact');
+  sel.innerHTML = DB.leads.map(l =>
+    `<option value="${l.id}"${l.id===selectedId?' selected':''}>${l.name}</option>`
+  ).join('');
+  if (!DB.leads.length) sel.innerHTML = '<option value="">— nenhum contato —</option>';
+}
+function saveAppt() {
+  const contactId = parseInt(document.getElementById('fa-contact').value);
+  const dt = document.getElementById('fa-datetime').value;
+  if (!contactId || !dt) { toast('Selecione contato e data/hora.', 'error'); return; }
+  const contact = DB.leads.find(l => l.id === contactId);
+  const appt = {
+    id: newId(),
+    contactId,
+    contactName: contact ? contact.name : 'Desconhecido',
+    datetime: dt,
+    type:     document.getElementById('fa-type').value,
+    duration: document.getElementById('fa-duration').value,
+    notes:    document.getElementById('fa-notes').value.trim(),
+  };
+  DB.appointments.push(appt);
+  if (contact) contact.nextAppt = dt;
+  saveDB();
+  closeModal('modal-appt-overlay');
+  toast('Consulta agendada!', 'success');
+  if (currentPage === 'agenda') { renderCalendar(); renderAgendaEvents(); }
+  if (currentPage === 'dashboard') renderDashboard();
+}
+
+// ─── SETTINGS ─────────────────────────────────────────────────────────────────
+function loadSettings() {
+  document.getElementById('cfg-name').value  = DB.settings.name  || '';
+  document.getElementById('cfg-crn').value   = DB.settings.crn   || '';
+  document.getElementById('cfg-phone').value = DB.settings.phone || '';
+  document.getElementById('cfg-email').value = DB.settings.email || '';
+}
+function saveSettings() {
+  DB.settings.name  = document.getElementById('cfg-name').value.trim();
+  DB.settings.crn   = document.getElementById('cfg-crn').value.trim();
+  DB.settings.phone = document.getElementById('cfg-phone').value.trim();
+  DB.settings.email = document.getElementById('cfg-email').value.trim();
+  saveDB();
+  toast('Configurações salvas!', 'success');
+}
+
+// ─── GLOBAL SEARCH ────────────────────────────────────────────────────────────
+document.getElementById('global-search').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase().trim();
+  if (!q) return;
+  const found = DB.leads.find(l => l.name.toLowerCase().includes(q) || l.phone.includes(q));
+  if (found) openDetail(found.id);
+});
+
+// ─── UTILITIES ────────────────────────────────────────────────────────────────
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(ov => {
+  ov.addEventListener('click', e => { if (e.target === ov) closeModal(ov.id); });
+});
+
+// New lead button
+document.getElementById('btn-new-lead').addEventListener('click', () => openNewLeadModal());
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeModal('modal-lead-overlay');
+    closeModal('modal-appt-overlay');
+    closeDetail();
+  }
+});
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+loadDB();
+seedData();
+renderDashboard();
+</script>
+</body>
+</html>
