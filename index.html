@@ -71,7 +71,7 @@ body {
   gap: 12px;
 }
 .sidebar-logo img {
-  width: 120px;
+  width: 168px;
   filter: brightness(0) invert(1);
   object-fit: contain;
 }
@@ -836,10 +836,139 @@ select { appearance: none; cursor: pointer; }
   gap: 8px;
   align-items: center;
 }
+
+/* ── LOGIN SCREEN ────────────────────────────── */
+#login-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.login-box {
+  background: var(--white);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--bg-muted);
+  box-shadow: var(--shadow-md);
+  width: 100%;
+  max-width: 400px;
+  padding: 40px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.login-logo {
+  width: 180px;
+  margin-bottom: 28px;
+}
+.login-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 22px;
+  color: var(--dark);
+  margin-bottom: 6px;
+  text-align: center;
+}
+.login-sub {
+  font-size: 13px;
+  color: var(--taupe);
+  margin-bottom: 28px;
+  text-align: center;
+}
+.login-form { width: 100%; display: flex; flex-direction: column; gap: 14px; }
+.login-form input {
+  padding: 12px 14px;
+  font-size: 14px;
+}
+.login-btn {
+  width: 100%;
+  padding: 13px;
+  font-size: 14px;
+  background: var(--sidebar);
+  color: #fff;
+  border: none;
+  border-radius: var(--r);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .18s;
+  margin-top: 4px;
+}
+.login-btn:hover { background: var(--sidebar-h); }
+.login-error {
+  background: rgba(185,64,64,.1);
+  color: var(--danger);
+  border: 1px solid rgba(185,64,64,.25);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: center;
+  display: none;
+}
+.login-error.show { display: block; }
+.login-footer-note {
+  font-size: 11px;
+  color: var(--taupe);
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* ── DRAG & DROP ─────────────────────────────── */
+.kanban-card[draggable="true"] { cursor: grab; }
+.kanban-card.dragging {
+  opacity: .45;
+  transform: scale(.97);
+  box-shadow: none;
+}
+.kanban-cards.drag-over {
+  background: rgba(96,47,25,.06);
+  border-radius: 10px;
+  outline: 2px dashed var(--sidebar);
+  outline-offset: -2px;
+}
+
+/* Logout btn in sidebar */
+.sidebar-logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  color: rgba(255,255,255,.55);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color .18s, background .18s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  border-top: 1px solid rgba(255,255,255,.1);
+  margin-top: 4px;
+}
+.sidebar-logout:hover { color: #fff; background: rgba(255,255,255,.08); }
 </style>
 </head>
 
 <body>
+<!-- ═══════════════ LOGIN ═══════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <img src="logo-carol.png" class="login-logo" alt="Carol Nutri" />
+    <div class="login-title">Bem-vinda, Carol!</div>
+    <div class="login-sub">Acesse o seu CRM de nutricionista</div>
+    <div class="login-form">
+      <input type="email" id="login-email" placeholder="E-mail" autocomplete="username" />
+      <input type="password" id="login-pass" placeholder="Senha" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter')doLogin()" />
+      <div class="login-error" id="login-error">E-mail ou senha incorretos.</div>
+      <button class="login-btn" onclick="doLogin()">Entrar</button>
+    </div>
+    <p class="login-footer-note">Carol Nutri CRM &copy; 2025</p>
+  </div>
+</div>
+
 <!-- ═══════════════ SIDEBAR ═══════════════ -->
 <aside id="sidebar">
   <div class="sidebar-logo">
@@ -872,7 +1001,11 @@ select { appearance: none; cursor: pointer; }
     </a>
   </nav>
   <div class="sidebar-footer">
-    Carol Nutri CRM &copy; 2025
+    <button class="sidebar-logout" onclick="doLogout()">
+      <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      Sair da conta
+    </button>
+    <div style="padding:10px 0 0;font-size:11px;color:rgba(255,255,255,.3);">Carol Nutri CRM &copy; 2025</div>
   </div>
 </aside>
 
@@ -1484,7 +1617,10 @@ function renderPipeline() {
           <span class="kanban-col-title">${col.label}</span>
           <span class="kanban-count">${cards.length}</span>
         </div>
-        <div class="kanban-cards" id="col-${col.key}">
+        <div class="kanban-cards" id="col-${col.key}"
+             ondragover="onColDragOver(event)"
+             ondragleave="onColDragLeave(event)"
+             ondrop="onColDrop(event,'${col.key}')">
           ${cards.map(l => kanbanCard(l)).join('')}
         </div>
         <div class="kanban-add" onclick="openNewLeadModal('${col.key}')">
@@ -1504,7 +1640,12 @@ function kanbanCard(l) {
     apptStr = `<span class="kanban-card-date">📅 ${d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}</span>`;
   }
   return `
-    <div class="kanban-card" onclick="openDetail(${l.id})">
+    <div class="kanban-card"
+         draggable="true"
+         data-lead-id="${l.id}"
+         onclick="openDetail(${l.id})"
+         ondragstart="onCardDragStart(event,${l.id})"
+         ondragend="onCardDragEnd(event)">
       <div class="kanban-card-name">${l.name}</div>
       <div class="kanban-card-goal">
         <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
@@ -1905,6 +2046,90 @@ function saveSettings() {
   toast('Configurações salvas!', 'success');
 }
 
+// ─── DRAG & DROP ──────────────────────────────────────────────────────────────
+let draggedLeadId = null;
+
+function onCardDragStart(event, id) {
+  draggedLeadId = id;
+  event.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => {
+    const el = document.querySelector(`.kanban-card[data-lead-id="${id}"]`);
+    if (el) el.classList.add('dragging');
+  }, 0);
+}
+
+function onCardDragEnd(event) {
+  document.querySelectorAll('.kanban-card.dragging').forEach(el => el.classList.remove('dragging'));
+  document.querySelectorAll('.kanban-cards.drag-over').forEach(el => el.classList.remove('drag-over'));
+  draggedLeadId = null;
+}
+
+function onColDragOver(event) {
+  event.preventDefault();
+  event.dataTransfer.dropEffect = 'move';
+  event.currentTarget.classList.add('drag-over');
+}
+
+function onColDragLeave(event) {
+  if (!event.currentTarget.contains(event.relatedTarget)) {
+    event.currentTarget.classList.remove('drag-over');
+  }
+}
+
+function onColDrop(event, colKey) {
+  event.preventDefault();
+  event.currentTarget.classList.remove('drag-over');
+  if (!draggedLeadId) return;
+  const l = DB.leads.find(x => x.id === draggedLeadId);
+  if (!l || l.status === colKey) return;
+  l.status = colKey;
+  saveDB();
+  renderPipeline();
+  renderDashboard();
+  toast(`${l.name} movido para "${statusLabels[colKey]}"`, 'success');
+}
+
+// ─── LOGIN / LOGOUT ────────────────────────────────────────────────────────────
+const AUTH_KEY   = 'carolnutri-auth';
+const VALID_EMAIL = 'carolinagassen0@gmail.com';
+const VALID_PASS  = '#admin1044';
+
+function checkAuth() {
+  const ok = sessionStorage.getItem(AUTH_KEY) === '1';
+  if (ok) {
+    document.getElementById('login-screen').style.display = 'none';
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+  }
+  return ok;
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const pass  = document.getElementById('login-pass').value;
+  const err   = document.getElementById('login-error');
+  if (email === VALID_EMAIL && pass === VALID_PASS) {
+    sessionStorage.setItem(AUTH_KEY, '1');
+    err.classList.remove('show');
+    document.getElementById('login-screen').style.display = 'none';
+    loadDB();
+    seedData();
+    renderDashboard();
+  } else {
+    err.classList.add('show');
+    document.getElementById('login-pass').value = '';
+    document.getElementById('login-pass').focus();
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem(AUTH_KEY);
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-pass').value  = '';
+  document.getElementById('login-error').classList.remove('show');
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
 // ─── GLOBAL SEARCH ────────────────────────────────────────────────────────────
 document.getElementById('global-search').addEventListener('input', e => {
   const q = e.target.value.toLowerCase().trim();
@@ -1935,8 +2160,10 @@ document.addEventListener('keydown', e => {
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 loadDB();
-seedData();
-renderDashboard();
+if (checkAuth()) {
+  seedData();
+  renderDashboard();
+}
 </script>
 </body>
 </html>
